@@ -4,19 +4,43 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/Arcan17/excel-automation/ci.yml?label=CI&logo=github)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat)
 
-A Python automation pipeline that processes raw sales data and generates a fully formatted, multi-sheet Excel report with charts — no manual work in Excel required.
-
-**The problem it solves:** Sales teams receive raw transaction exports that must be cleaned, aggregated, and formatted into a management report every month. This pipeline automates the entire flow in seconds.
+A Python script that reads a raw sales Excel file and automatically generates a fully formatted, multi-sheet Excel report with charts — no manual work in Excel required.
 
 ---
 
-## What it generates
+## The problem it solves
 
-A 4-sheet Excel workbook:
+Every month, sales teams export a plain transaction log from their system:
+
+| Fecha | Producto | Vendedor | Region | Precio_Unitario | Cantidad | Total |
+|---|---|---|---|---|---|---|
+| 2024-01-05 | Laptop Pro 15 | Ana García | Norte | 850,000 | 1 | 850,000 |
+| 2024-01-12 | Monitor 4K | Carlos López | Sur | 320,000 | 2 | 640,000 |
+| ... | | | | | | |
+
+Someone then has to manually clean that data, build pivot tables, apply formatting, and create charts — which takes hours.
+
+**This script does all of that in seconds.** You drop in the raw file, run one command, and get a polished Excel report ready to send to management.
+
+---
+
+## Input → Output
+
+```
+data/ventas.xlsx              →   reports/informe_ventas_2024.xlsx
+(raw transactions, one        →   (formatted 4-sheet Excel report
+ row per sale)                     with charts, ready to share)
+```
+
+The output is a standard **`.xlsx` file** — open it with Excel, Google Sheets, or Numbers.
+
+---
+
+## What the report contains
 
 | Sheet | Content |
 |---|---|
-| **Resumen Ejecutivo** | KPI cards (revenue, units, transactions) + Top 5 products mini-table |
+| **Resumen Ejecutivo** | KPI cards (total revenue, units sold, transactions) + Top 5 products table |
 | **Ventas Mensuales** | Month-by-month breakdown table + bar chart |
 | **Top Productos** | Top 5 products ranked by revenue |
 | **Por Vendedor** | Performance table per seller |
@@ -28,19 +52,19 @@ A 4-sheet Excel workbook:
 
 ---
 
-## How it works
+## How it works internally
 
 ```
 ventas.xlsx (raw data)
         │
         ▼
-  clean_data()        ← drops nulls, removes invalid rows, adds period columns
+  clean_data()        ← removes nulls, invalid rows, adds month column
         │
         ▼
-   analyze()          ← aggregations: monthly, top products, by seller, by region
+   analyze()          ← groups by month / product / seller / region
         │
         ▼
- generate_report()    ← openpyxl: formatting, merged cells, number formats, chart
+ generate_report()    ← builds Excel with colors, merged cells, number formats, chart
         │
         ▼
 informe_ventas_2024.xlsx
